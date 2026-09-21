@@ -6,7 +6,7 @@ import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.block.*;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
@@ -40,7 +40,7 @@ public final class SkyBloodAudit extends JavaPlugin implements Listener {
  private final HttpClient http=HttpClient.newHttpClient();
  private BukkitTask et,dt,wt; private final DateTimeFormatter tf=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
- public void onEnable(){saveDefaultConfig();setupEco();setupDb();macroGuard=new MacroGuard(this);getServer().getPluginManager().registerEvents(this,this); integrations=new IntegrationManager(this); integrations.load();for(Player p:Bukkit.getOnlinePlayers())init(p);tasks();record("SYSTEM",null,null,"START","v5.0 iniciado",null,null,null,false);}
+ public void onEnable(){saveDefaultConfig();setupEco();setupDb();macroGuard=new MacroGuard(this);getServer().getPluginManager().registerEvents(this,this); integrations=new IntegrationManager(this); integrations.load();for(Player p:Bukkit.getOnlinePlayers())init(p);tasks();record("SYSTEM",null,"START","v5.0 iniciado",null,null,null,false);}
  public void onDisable(){for(BukkitTask t:new BukkitTask[]{et,dt,wt})if(t!=null)t.cancel();try{if(db!=null)db.close();}catch(Exception ignored){}}
  private void setupEco(){RegisteredServiceProvider<Economy> r=getServer().getServicesManager().getRegistration(Economy.class);eco=r==null?null:r.getProvider();}
  private void setupDb(){if(!getConfig().getBoolean("database.enabled",true))return;try{Files.createDirectories(getDataFolder().toPath());String f=getConfig().getString("database.file","audit.db");db=DriverManager.getConnection("jdbc:sqlite:"+getDataFolder().toPath().resolve(f));try(Statement s=db.createStatement()){s.executeUpdate("PRAGMA journal_mode=WAL");s.executeUpdate("CREATE TABLE IF NOT EXISTS audit_events(id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT NOT NULL, type TEXT NOT NULL, player_uuid TEXT, player_name TEXT, action TEXT, detail TEXT, world TEXT, x INTEGER, y INTEGER, z INTEGER, critical INTEGER NOT NULL DEFAULT 0)");s.executeUpdate("CREATE INDEX IF NOT EXISTS idx_audit_player ON audit_events(player_name,ts)");s.executeUpdate("CREATE INDEX IF NOT EXISTS idx_audit_type ON audit_events(type,ts)");s.executeUpdate("CREATE TABLE IF NOT EXISTS item_fingerprints(id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT, fingerprint TEXT, player_uuid TEXT, player_name TEXT, material TEXT, amount INTEGER, detail TEXT)");s.executeUpdate("CREATE INDEX IF NOT EXISTS idx_fp ON item_fingerprints(fingerprint,ts)");}}catch(Exception e){getLogger().severe("SQLite: "+e.getMessage());db=null;}}
