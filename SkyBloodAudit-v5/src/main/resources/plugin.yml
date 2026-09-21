@@ -1,0 +1,14 @@
+name: SkyBloodAudit
+version: 5.0.0
+main: br.com.skyblood.audit.SkyBloodAudit
+api-version: '1.21'
+depend: [Vault]
+softdepend: [LuckPerms, Essentials, EconomyShopGUI, AmazingAuction, AxMinions, RoseStacker, ExcellentCrates]
+commands:
+  sbaudit:
+    permission: skybloodaudit.admin
+permissions:
+  skybloodaudit.admin:
+    default: op
+  skybloodaudit.staff:
+    default: false

@@ -1,0 +1,136 @@
+discord:
+  enabled: true
+  webhook-url: "COLE_SEU_WEBHOOK_AQUI"
+  username: "SkyBlood Audit"
+  staff-color: 15158332
+  player-color: 3447003
+  antidupe-color: 16753920
+  economy-color: 15844367
+  permission-color: 10038562
+  # Marca @everyone (com allowed_mentions real, não só o texto) nos alertas críticos
+  # (dupe, item via creative, fingerprint duplicado, macro detectado, etc.)
+  mention-everyone-on-critical: true
+  # Intervalo mínimo entre pings de @everyone, para não virar spam quando vários
+  # alertas críticos disparam em sequência. 0 = sem cooldown (não recomendado).
+  everyone-cooldown-seconds: 60
+macro-protection:
+  enabled: true
+  # Quais categorias de ação são monitoradas. Desative individualmente se precisar.
+  actions:
+    ATTACK: true   # golpes em entidades (autoclicker de PVP)
+    INTERACT: true # clique direito (farm/colheita/uso de bloco por script)
+    BREAK: true    # quebra de bloco (bots de mineração/farm)
+    CLICK: true    # cliques em GUI/inventário (spam de compra/abertura de baú)
+  window-size: 60             # amostras mantidas por jogador/ação
+  min-samples: 24             # amostras mínimas antes de qualquer análise
+  min-span-seconds: 40        # tempo mínimo coberto pela janela antes de avaliar (evita falso positivo em rajada curta)
+  evaluate-every-n-actions: 8 # roda a análise a cada N novas ações (limita custo de CPU)
+  # Os quatro sinais abaixo são combinados por peso. Isso é intencional: um script
+  # que só evita UM sinal (ex.: adiciona jitter mas ainda cicla entre poucos valores)
+  # ainda é pego pelos outros. Nenhum sinal sozinho decide o alerta.
+  cv-threshold: 0.15
+  repetition-tolerance-ms: 15
+  repetition-ratio-threshold: 0.4
+  cycle-bucket-ms: 50
+  cycle-max-buckets: 3
+  cycle-coverage-threshold: 0.85
+  round-tick-tolerance-ms: 6
+  round-tick-ratio-threshold: 0.5
+  weights:
+    low-variance: 0.35
+    repetition: 0.25
+    cycling: 0.25
+    round-tick: 0.15
+  confidence-threshold: 0.65
+  # Exige o padrão em janelas CONSECUTIVAS antes de alertar (não dispara em pico isolado)
+  required-consecutive-flags: 2
+  # Depois de alertar, espera esse tempo antes de alertar de novo o mesmo jogador/ação
+  cooldown-seconds: 120
+staff:
+  permission: "skybloodaudit.staff"
+  fallback-permissions: ["luckperms.*", "worldedit.*", "worldguard.*", "essentials.gamemode", "essentials.give"]
+economy:
+  enabled: true
+  check-interval-ticks: 20
+  minimum-change: 0.01
+  critical-change: 1000000.0
+antidupe:
+  enabled: true
+  scan-interval-ticks: 10
+  grace-seconds: 5
+  alert-minimum-gain: 16
+  high-value-minimum-gain: 2
+  high-value-materials: [SPAWNER, SHULKER_BOX, NETHERITE_BLOCK, NETHERITE_INGOT, DIAMOND_BLOCK, DIAMOND, ELYTRA, NETHER_STAR, BEACON]
+fingerprints:
+  enabled: true
+  # Itens com lore/nome/model-data/PDC são tratados como custom e recebem fingerprint observável.
+  # O plugin NÃO modifica itens vanilla automaticamente.
+  alert-identical-custom-stacks: true
+commands:
+  sensitive: [login, register, changepassword, 2fa, pin]
+  critical: [op, deop, lp, luckperms, eco, economy, give, clear, gamemode, gm, gmc, gms, invsee, sudo, execute, fill, setblock, summon, kill, ban, kick, stop, restart]
+  provenance-prefixes: [shop, loja, ah, auction, crate, crates, minion, minions, trade, pay, sellall, is]
+database:
+  enabled: true
+  file: "audit.db"
+local-log:
+  enabled: true
+
+# Integrações detectadas no servidor do usuário.
+integrations:
+  EconomyShopGUI:
+    enabled: true
+    detected-version: "7.2.1"
+    command-hints: [shop, loja, sellall]
+    gui-hints: [shop, loja, buy, sell, comprar, vender]
+  AmazingAuction:
+    enabled: true
+    detected-version: "installed"
+    command-hints: [ah, auction]
+    gui-hints: [auction, leilao, leilão]
+  AxMinions:
+    enabled: true
+    detected-version: "1.0.20"
+    command-hints: [minion, minions]
+    gui-hints: [minion]
+  ExcellentCrates:
+    enabled: true
+    detected-version: "6.6.1"
+    command-hints: [crate, crates]
+    gui-hints: [crate, caixa, key, chave]
+  RoseStacker:
+    enabled: true
+    detected-version: "1.5.41"
+    command-hints: [rs, rosestacker, spawner]
+    gui-hints: [spawner, stack]
+  SuperiorSkyblock2:
+    enabled: true
+    detected-version: "2026.2"
+    command-hints: [is, island]
+    gui-hints: [island, ilha, upgrade]
+  LuckPerms:
+    enabled: true
+    detected-version: "5.5.71"
+  Essentials:
+    enabled: true
+    detected-version: "2.22.0"
+  WorldEdit:
+    enabled: true
+    detected-version: "7.4.5"
+  WorldGuard:
+    enabled: true
+    detected-version: "7.0.17"
+
+direct-integrations:
+  enabled: true
+  # Direct event hooks are loaded reflectively. If a plugin/API changes, only that adapter is disabled.
+  EconomyShopGUI: true
+  ExcellentCrates: true
+  RoseStacker: true
+  AxMinions: true
+  SuperiorSkyblock2: true
+  AmazingAuction: true
+compatibility:
+  fail-safe: true
+  notify-version-changes: true
+  versions-file: "integration-versions.yml"
